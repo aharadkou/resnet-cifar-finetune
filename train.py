@@ -6,7 +6,6 @@ import os
 import numpy as np
 
 os.environ["WANDB_PROJECT"] = "resnet-cifar-finetune"
-os.environ["WANDB_LOG_MODEL"] = "checkpoint"
 dataset = "cifar10"
 checkpoint = "microsoft/resnet-18"
 training_args = TrainingArguments(
@@ -21,6 +20,7 @@ training_args = TrainingArguments(
     num_train_epochs=10,
     warmup_ratio=0.1,
     logging_steps=10,
+    do_eval=True,
     load_best_model_at_end=True,
     metric_for_best_model="accuracy",
     push_to_hub=False,
