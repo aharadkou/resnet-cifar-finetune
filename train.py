@@ -2,8 +2,11 @@ from datasets import load_dataset
 from transformers import AutoModelForImageClassification, TrainingArguments, Trainer, DefaultDataCollator, AutoImageProcessor
 from torchvision.transforms import RandomResizedCrop, Compose, Normalize, ToTensor
 import evaluate
+import os
 import numpy as np
 
+os.environ["WANDB_PROJECT"] = "resnet-cifar-finetune"
+os.environ["WANDB_LOG_MODEL"] = "checkpoint"
 dataset = "cifar10"
 checkpoint = "microsoft/resnet-18"
 training_args = TrainingArguments(
@@ -15,12 +18,13 @@ training_args = TrainingArguments(
     per_device_train_batch_size=16,
     gradient_accumulation_steps=4,
     per_device_eval_batch_size=16,
-    num_train_epochs=3,
+    num_train_epochs=10,
     warmup_ratio=0.1,
     logging_steps=10,
     load_best_model_at_end=True,
     metric_for_best_model="accuracy",
     push_to_hub=False,
+    report_to="wandb"
 )
 accuracy = evaluate.load("accuracy")
 
