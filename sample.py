@@ -12,7 +12,7 @@ if len(sys.argv) > 1:
 
 image = ds["img"][i]
 
-classifier = pipeline("image-classification", model="model/checkpoint-2343")
+classifier = pipeline("image-classification", model="model/checkpoint-7810")
 result = classifier(image)
 
 image.save("tmp.png")

@@ -1,13 +1,13 @@
 from datasets import load_dataset
 from transformers import AutoModelForImageClassification, TrainingArguments, Trainer, DefaultDataCollator, AutoImageProcessor
-from torchvision.transforms import RandomResizedCrop, Compose, Normalize, ToTensor
+from torchvision.transforms import CenterCrop, Compose, Normalize, ToTensor
 import evaluate
 import os
 import numpy as np
 
 os.environ["WANDB_PROJECT"] = "resnet-cifar-finetune"
 dataset = "cifar10"
-checkpoint = "microsoft/resnet-18"
+checkpoint = "google/vit-base-patch16-224"
 training_args = TrainingArguments(
     output_dir="model",
     remove_unused_columns=False,
@@ -34,21 +34,17 @@ def compute_metrics(eval_pred):
     return accuracy.compute(predictions=predictions, references=labels)
 
 def get_img_transforms(image_processor):
-  print("Image size: " + str(image_processor.size["shortest_edge"]))
+  size = image_processor.size
+  
+  print("Image size: " + str(size))
 
-  size = (
-      image_processor.size["shortest_edge"]
-      if "shortest_edge" in image_processor.size
-      else (image_processor.size["height"], image_processor.size["width"])
-  )
-
-  _transforms = Compose([RandomResizedCrop(size), ToTensor(), Normalize(mean=image_processor.image_mean, std=image_processor.image_std)])
+  _transforms = Compose([CenterCrop([size['width'], size['height']]), ToTensor(), Normalize(mean=image_processor.image_mean, std=image_processor.image_std)])
 
   def transforms(examples):
       examples["pixel_values"] = [_transforms(img.convert("RGB")) for img in examples["img"]]
       del examples["img"]
       return examples
-  
+
   return transforms
 
 
