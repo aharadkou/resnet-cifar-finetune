@@ -1,6 +1,6 @@
 from datasets import load_dataset
 from transformers import AutoModelForImageClassification, TrainingArguments, Trainer, DefaultDataCollator, AutoImageProcessor
-from torchvision.transforms import RandomResizedCrop, Compose, Normalize, ToTensor
+from torchvision.transforms import Resize, Compose, Normalize, ToTensor
 import evaluate
 import os
 import numpy as np
@@ -42,7 +42,7 @@ def get_img_transforms(image_processor):
       else (image_processor.size["height"], image_processor.size["width"])
   )
 
-  _transforms = Compose([RandomResizedCrop(size), ToTensor(), Normalize(mean=image_processor.image_mean, std=image_processor.image_std)])
+  _transforms = Compose([Resize([size, size]), ToTensor(), Normalize(mean=image_processor.image_mean, std=image_processor.image_std)])
 
   def transforms(examples):
       examples["pixel_values"] = [_transforms(img.convert("RGB")) for img in examples["img"]]
